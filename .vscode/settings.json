@@ -1,3 +1,4 @@
 {
-    "julia.persistentSession.tmuxSessionName": "tyy_julia_vscode"
+    "julia.persistentSession.tmuxSessionName": "tyy_julia_vscode",
+    "julia.persistentSession.enabled": true
 }

@@ -9,39 +9,64 @@ myT2 = BigFloat
 
 @time O1sol = O1du1solve(
     O1du1,
-    rhomin=myT(0.00001),
-    rho0=myT(10),
-    A0=myT(val_A02),
-    rtol=1e-20,
-    atol=1e-20,
-    method=RadauIIA5(),
+    rhomin = myT(0.00001),
+    rho0 = myT(10),
+    A0 = myT(val_A02),
+    rtol = 1e-20,
+    atol = 1e-20,
+    method = RadauIIA5(),
 )
 
 
 @time O1du0sol = du0solve(
     O1du0,
     myT(val_A0),
-    rtol=1e-16,
-    atol=1e-16,
-    method=RadauIIA5(),
-    d=myT(3),
+    rtol = 1e-16,
+    atol = 1e-16,
+    method = RadauIIA5(),
+    d = myT(3),
 )
 plot(O1du0sol.t[1:1000], O1du0sol.u3[1:1000])
 
 
 
-val_A0 = find_zero(getA0, (84.1 / 3 |> myT, 84.2 / 3 |> myT), Bisection(), rtol=1e-4, atol=1e-4)
+val_A0 = find_zero(
+    getA0,
+    (84.1 / 3 |> myT, 84.2 / 3 |> myT),
+    Bisection(),
+    rtol = 1e-4,
+    atol = 1e-4,
+)
 val_A02 = find_zero(
     getA02,
     (val_A0 - 1e-9 |> myT, val_A0 + 1e-9 |> myT),
     Bisection(),
-    rtol=1e-2,
-    atol=1e-2,
+    rtol = 1e-2,
+    atol = 1e-2,
 )
-val_lambda2 = find_zero(getlambda0, (-0.7 |> myT, -0.6 |> myT), Bisection(), rtol=10, atol=10)
-val_lambda3 = find_zero(getlambda0, (-3.3 |> myT, -2.9 |> myT), Bisection(), rtol=1e-2, atol=1 - 2)
-val_lambda4 = find_zero(getlambda0, (-6.2 |> myT, -5.3 |> myT), Bisection(), rtol=1e-6, atol=1 - 6)
-val_lambda5 = find_zero(getlambda0, (-8.9 |> myT, -8.1 |> myT), Bisection(), rtol=1e-8, atol=1 - 8)
+val_lambda2 =
+    find_zero(getlambda0, (-0.7 |> myT, -0.6 |> myT), Bisection(), rtol = 10, atol = 10)
+val_lambda3 = find_zero(
+    getlambda0,
+    (-3.3 |> myT, -2.9 |> myT),
+    Bisection(),
+    rtol = 1e-2,
+    atol = 1 - 2,
+)
+val_lambda4 = find_zero(
+    getlambda0,
+    (-6.2 |> myT, -5.3 |> myT),
+    Bisection(),
+    rtol = 1e-6,
+    atol = 1 - 6,
+)
+val_lambda5 = find_zero(
+    getlambda0,
+    (-8.9 |> myT, -8.1 |> myT),
+    Bisection(),
+    rtol = 1e-8,
+    atol = 1 - 8,
+)
 
 
 
@@ -53,18 +78,18 @@ itp2 = Interpolations.interpolate((O1du0sol.t,), O1du0sol.u3, Gridded(Linear()))
 
 eigensol = Eigensolve(
     Eigenfun,
-    u1fun=itp1,
-    u2fun=itp2,
-    rhomin=myT(0.00001),
-    rho0=myT(10),
-    A0=myT(-170),
-    d=myT(3.0),
-    n=myT(1),
-    η=myT(0),
-    λ=myT(1.6),
-    rtol=1e-14,
-    atol=1e-14,
-    method=RadauIIA5(),
+    u1fun = itp1,
+    u2fun = itp2,
+    rhomin = myT(0.00001),
+    rho0 = myT(10),
+    A0 = myT(-170),
+    d = myT(3.0),
+    n = myT(1),
+    η = myT(0),
+    λ = myT(1.6),
+    rtol = 1e-14,
+    atol = 1e-14,
+    method = RadauIIA5(),
 )
 
 dv1(1.548, itp1, 0.00001)
