@@ -29,56 +29,6 @@ myT2 = BigFloat
 plot(O1du0sol.t[1:1000], O1du0sol.u3[1:1000])
 
 
-function getA0(A0)
-    sol = du0solve(
-        O1du0,
-        myT(A0),
-        rtol=1e-20,
-        atol=1e-20,
-        method=RadauIIA5(),
-    )
-    @show A0
-    return @show Nderivative(sol.t[1:100], sol.u3[1:100], sol.t[1])
-end
-
-
-
-
-function getA02(A0)
-    sol = O1du1solve(
-        O1du1,
-        rhomin=myT(0.00001),
-        rho0=myT(10),
-        A0=myT(A0),
-        rtol=1e-20,
-        atol=1e-20,
-        method=RadauIIA5(),
-    )
-    @show A0
-    return @show Nderivative(sol.t[1:100], sol.u3[1:100], sol.t[1])
-end
-
-
-function getlambda0(x)
-    sol = Eigensolve(
-        Eigenfun,
-        u1fun=itp1,
-        u2fun=itp2,
-        rhomin=myT(0.00001),
-        rho0=myT(10),
-        A0=myT(2.0),
-        d=myT(3.0),
-        n=myT(1),
-        η=myT(0),
-        λ=myT(x),
-        rtol=1e-20,
-        atol=1e-20,
-        method=RadauIIA5(),
-    )
-    @show x
-    return @show Nderivative(sol.t[1:100], sol.u2[1:100], sol.t[1])
-end
-
 
 val_A0 = find_zero(getA0, (84.1 / 3 |> myT, 84.2 / 3 |> myT), Bisection(), rtol=1e-4, atol=1e-4)
 val_A02 = find_zero(
@@ -111,9 +61,9 @@ eigensol = Eigensolve(
     d=myT(3.0),
     n=myT(1),
     η=myT(0),
-    λ=myT(1.5),
-    rtol=1e-20,
-    atol=1e-20,
+    λ=myT(1.6),
+    rtol=1e-14,
+    atol=1e-14,
     method=RadauIIA5(),
 )
 
@@ -121,7 +71,7 @@ dv1(1.548, itp1, 0.00001)
 
 plot(eigensol.t[1:100], eigensol.u1[1:100])
 plot(eigensol.t[1:200], eigensol.u2[1:200])
-1/1.8
+
 
 plot!(O1sol.t[1:30], O1sol.u2[1:30])
 plot(O1du0sol.t[1:300], O1du0sol.u3[1:300])
