@@ -61,10 +61,10 @@ function inidu0(γ::T, rho0::T; d::T=T(3), n::T=T(1), η::T=T(0)) where {T}
     end
 end
 
-
+#A0 is ̄A0
 function iniEigen(A0, rho0, d, η, λ)
     [
-        A0 * rho0^((d - λ) / (d - 2 + η)),
-        (A0 * (d - λ)) / (rho0^((-2 + λ + η) / (-2 + d + η)) * (-2 + d + η)),
+        A0 * rho0^((d) / (d - 2 + η)),
+        (A0 * (d - λ)*rho0^((2- η) / (-2 + d + η))) / (-2 + d + η),
     ]
 end

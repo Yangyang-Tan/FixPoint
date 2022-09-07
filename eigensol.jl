@@ -1,4 +1,28 @@
 eigensol1 = Eigensolve(
+    Eigenfun;
+    u1fun=itp1,
+    u2fun=itp2,
+    rhomin=myT(0.00001),
+    rho0=myT(10),
+    A0=myT(Optim.minimizer(opteigensol)[1]),
+    d=myT(3.0),
+    n=myT(1),
+    η=myT(0),
+    λ=myT(Optim.minimizer(opteigensol)[2]),
+    rtol=1e-14,
+    atol=1e-14,
+    method=RadauIIA5(),
+)
+
+
+plot(x -> eigensol1.sol(x)[1], 0.00001, 0.07; label="λ1")
+
+
+
+
+
+
+eigensol1 = Eigensolve(
     Eigenfun,
     u1fun=itp1,
     u2fun=itp2,
