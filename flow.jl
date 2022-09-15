@@ -1,11 +1,15 @@
 #Flow eqn for O(1) and u'(ρ)
-function O1du1(du, u, p, rho; d::T, n::T, η::T = 0) where {T}
-    c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
+function O1du1(du, u, p, rho)
+    d, n, η, c1 = p
+    # c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
     du[1] = u[2]
     du[2] = u[3]
     du[3] =
-        -(3 * u[2] + 2 * rho * u[3]) / (6 * pi^2 * (1 + u[1] + 2 * rho * u[2])^2) +
-        rho * u[2] - 2 * u[1]
+        (
+            (1 + u[2] + 2 * rho * u[3])^2 * (-2 * u[2] + (-2 + d) * rho * u[3]) -
+            c1 * u[3] * (3 + ((-1 + n) * (1 + u[2] + 2 * rho * u[3])^2) / (1 + u[2])^2)
+        ) / (2 * c1 * rho)
+    return nothing
 end
 
 #Flow eqn for O(1) and u(ρ), u[1] for u(ρ), u[2] for u'(ρ), u[3] for u''(ρ)
@@ -17,6 +21,7 @@ function O1du0(du, u, p, rho)
     du[3] =
         c1 * ((-1 + n) / (1 + u[2]) + (1 + u[2] + 2 * rho * u[3])^(-1)) - (d * u[1]) +
         (-2 + d + η) * rho * u[2]
+    return nothing
 end
 
 #Eigen perturbation ode at O(ϵ)
@@ -25,7 +30,7 @@ function Eigenfun(du, u, p, rho, U1, U2)
     c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
     # @show rho
     du[1] = u[2]
-    du[2] =
+    return du[2] =
         ((-d + λ) * u[1] * (1 + U1(rho) + 2 * rho * U2(rho))^2) / (2 * c1 * rho) +
         (1 / (2 * c1 * rho)) *
         u[2] *
@@ -34,8 +39,6 @@ function Eigenfun(du, u, p, rho, U1, U2)
             (c1 * (-1 + n) * (1 + U1(rho) + 2 * rho * U2(rho))^2) / (1 + U1(rho))^2 - c1
         )
 end
-
-
 
 function test1()
     A0 = 809.0
@@ -57,7 +60,7 @@ function geterror(sol)
        (6 * pi^2 * (1 + sol.u1 + 2 * sol.t * sol.u2)^2) + sol.t * sol.u2 - 2 * sol.u1
 end
 
-function dv1(λ, U1, rho, d = 3, n = 1, η = 0)
+function dv1(λ, U1, rho, d=3, n=1, η=0)
     c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
     return (c1^-1) * (λ - d) * (1 + U1(rho))^2 / n
 end

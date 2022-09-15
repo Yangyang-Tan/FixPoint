@@ -7,10 +7,10 @@ myT = Double64
 myT2 = BigFloat
 
 @time O1sol = O1du1solve(
-    O1du1;
+    O1du1,
+    myT(val_A0);
     rhomin=myT(0.00001),
     rho0=myT(10),
-    A0=myT(val_A02),
     rtol=1e-20,
     atol=1e-20,
     method=RadauIIA5(),
@@ -20,19 +20,13 @@ myT2 = BigFloat
     O1du0, myT(val_A0); rtol=1e-16, atol=1e-16, method=RadauIIA5(), d=myT(3)
 )
 
+@time O1du0sol = du0solve(
+    O1du0, myT(val_A0); rtol=1e-16, atol=1e-16, method=RadauIIA5(), d=myT(3)
+)
+
 val_A0 = find_zero(getA0, (myT(84.1 / 3), myT(84.2 / 3)), Bisection(); rtol=1e-4, atol=1e-4)
 val_A02 = find_zero(
     getA02, (myT(val_A0 - 1e-9), myT(val_A0 + 1e-9)), Bisection(); rtol=1e-2, atol=1e-2
-)
-val_lambda2 = find_zero(getlambda0, (myT(-0.7), myT(-0.6)), Bisection(); rtol=10, atol=10)
-val_lambda3 = find_zero(
-    getlambda0, (myT(-3.3), myT(-2.9)), Bisection(); rtol=1e-2, atol=1 - 2
-)
-val_lambda4 = find_zero(
-    getlambda0, (myT(-6.2), myT(-5.3)), Bisection(); rtol=1e-6, atol=1 - 6
-)
-val_lambda5 = find_zero(
-    getlambda0, (myT(-8.9), myT(-8.1)), Bisection(); rtol=1e-8, atol=1 - 8
 )
 
 1 / val_lambda
@@ -61,6 +55,8 @@ opteigensol = getlambda0(
     Eigenfun;
     u1fun=itp1,
     u2fun=itp2,
+    lambdalb=myT(-6.0),
+    deltalambda=myT(0.5),
     rhomin=myT(0.00001),
     rho0=myT(10),
     d=myT(3.0),
@@ -70,10 +66,10 @@ opteigensol = getlambda0(
     atol=1e-12,
     method=RadauIIA5(),
 )
-
+1
 minimum(opteigensol)
-1/Optim.minimizer(opteigensol)[2]
-
+1 / Optim.minimizer(opteigensol)[2]
+Optim.minimizer(opteigensol)
 
 plot(eigensol.t[1:100], eigensol.u1[1:100])
 plot(eigensol.t[1:200], eigensol.u2[1:200])

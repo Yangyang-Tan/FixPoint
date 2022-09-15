@@ -1,14 +1,27 @@
-function O1du1solve(
-    eqnfun; rhomin::T, rho0::T, A0::T, atol=1e-5, rtol=1e-5, method=Rodas4()
+function du1solve(
+    eqnfun,
+    A0::T;
+    rhomin::T=T(0.00001),
+    rho0::T=T(10),
+    d::T=T(3),
+    n::T=T(1),
+    η::T=T(0),
+    atol=1e-5,
+    rtol=1e-5,
+    dtmax=0.005,
+    method=Rodas4(),
 ) where {T}
-    Mass = T.([1.0 0 0; 0 1.0 0; 0 0 0])
-    f = ODEFunction(eqnfun; mass_matrix=Mass)
+    # Mass = T.([1.0 0 0; 0 1.0 0; 0 0 0])
+    c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
+    p = [d, n, η, c1]
+    f = ODEFunction(eqnfun)
     tspan = (rho0, rhomin)
     # differential_vars = [true, true, false]
-    u0 = iniO1du1(A0, rho0)
-    prob = ODEProblem(f, u0, tspan)
+    # u0 = iniO1du1(A0, rho0)
+    u0 = inidu0(A0, rho0; d=d, n=n, η=η)
+    prob = ODEProblem(f, u0, tspan, p)
     sol = solve(
-        prob, method; abstol=atol, reltol=rtol, maxiters=10^7, dtmax=0.00002, dtmin=1e-200
+        prob, method; abstol=atol, reltol=rtol, maxiters=10^7, dtmax=dtmax, dtmin=1e-100
     )
     return USolution(sol)
 end
@@ -34,7 +47,7 @@ function du0solve(
     u0 = inidu0(A0, rho0; d=d, n=n, η=η)
     prob = ODEProblem(f, u0, tspan, p)
     sol = solve(
-        prob, method; abstol=atol, reltol=rtol, maxiters=10^7, dtmax=0.001, dtmin=1e-400
+        prob, method; abstol=atol, reltol=rtol, maxiters=10^7, dtmax=0.0001, dtmin=1e-400
     )
     return USolution(sol)
 end
@@ -69,24 +82,26 @@ end
 #       Optimization  functions               #
 ###############################################
 
-function getA0(A0)
-    sol = du0solve(O1du0, myT(A0); rtol=1e-20, atol=1e-20, method=RadauIIA5())
+# function getA0(A0)
+#     sol = du0solve(O1du0, myT(A0); rtol=1e-20, atol=1e-20, method=RadauIIA5())
+#     @show A0
+#     return @show Nderivative(sol.t[1:100], sol.u3[1:100], sol.t[1])
+# end
+
+function getA0(A0::T; d::T=T(3.0), n::T=T(1.0), η::T=T(0.0)) where {T}
+    sol = du0solve(
+        O1du0, myT(A0); rtol=1e-20, atol=1e-20, method=RadauIIA5(), d=d, n=n, η=η
+    )
     @show A0
     return @show Nderivative(sol.t[1:100], sol.u3[1:100], sol.t[1])
 end
 
-function getA02(A0)
-    sol = O1du1solve(
-        O1du1;
-        rhomin=myT(0.00001),
-        rho0=myT(10),
-        A0=myT(A0),
-        rtol=1e-20,
-        atol=1e-20,
-        method=RadauIIA5(),
+function getA02(A0::T; d::T=T(3.0), n::T=T(1.0), η::T=T(0.0)) where {T}
+    sol = du1solve(
+        O1du1, A0,rhomin=T(1e-8), rtol=1e-22, atol=1e-22, method=RadauIIA5(), d=d, n=n, η=η
     )
     @show A0
-    return @show Nderivative(sol.t[1:100], sol.u3[1:100], sol.t[1])
+    return @show Nderivative(sol.t[1:1000], sol.u3[1:1000], sol.t[1])
 end
 
 function Eigensolve(
@@ -150,7 +165,7 @@ function getlambda0(
     rho0::T,
     rhomin::T,
     lambdalb::T,
-    dlambda::T,
+    deltalambda::T,
     d::T=T(3),
     n::T=T(1),
     η::T=T(0),
@@ -162,7 +177,7 @@ function getlambda0(
         return sum(
             abs2,
             LossEigensolve(
-                Eigenfun,
+                Eigenfun;
                 u1fun=u1fun,
                 u2fun=u2fun,
                 rhomin=rhomin,
@@ -186,16 +201,21 @@ function getlambda0(
     #     # optimization stops.
     #     return false
     # end
-    u0=[-10.0,lambdalb+dlambda/2].|>T
-    lb = T.([-200.0,lambdalb])
-    ub = T.([200.0,lambdalb+dlambda])
+    u0 = T.([-10.0, lambdalb + deltalambda / 2])
+    lb = T.([-50000000.0, lambdalb])
+    ub = T.([50000000.0, lambdalb + deltalambda])
     # adtype = Optimization.AutoZygote()
     # optf = Optimization.OptimizationFunction((x, p) -> lossEigen(x), Optimization.AutoForwardDiff())
     # optprob = Optimization.OptimizationProblem((x, p) -> lossEigen(x),u0, p, lb=[1.5, -200.0].|>T, ub=[1.6, -50.0].|>T)
     # result_ode = Optimization.solve(optprob, BBO_adaptive_de_rand_1_bin())
-    result_ode=Optim.optimize(lossEigen,lb,ub, u0, Fminbox(NelderMead()), Optim.Options(iterations = 100,g_tol=1e-5))
+    inner_optimizer = Optim.NelderMead()
+    result_ode = Optim.optimize(
+        lossEigen,
+        lb,
+        ub,
+        u0,
+        Fminbox(inner_optimizer),
+        Optim.Options(; iterations=200, g_tol=1e-5),
+    )
     return result_ode
 end
-
-using OptimizationOptimJL
-sol = solve(prob,NelderMead())
