@@ -1,4 +1,9 @@
 {
     "julia.persistentSession.tmuxSessionName": "tyy_julia_vscode",
-    "julia.persistentSession.enabled": true
+    "julia.persistentSession.enabled": true,
+    "julia.additionalArgs": [
+    "--optimize=3",
+    "--check-bounds=no",
+    "--sysimage /home/tyy/.julia/environments/v1.8/JuliaSysimage.so"
+    ]
 }

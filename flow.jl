@@ -6,8 +6,8 @@ function O1du1(du, u, p, rho)
     du[2] = u[3]
     du[3] =
         (
-            (1 + u[2] + 2 * rho * u[3])^2 * (-2 * u[2] + (-2 + d) * rho * u[3]) -
-            c1 * u[3] * (3 + ((-1 + n) * (1 + u[2] + 2 * rho * u[3])^2) / (1 + u[2])^2)
+            (1 + u[2] + 2 * rho * u[3])^2 * ((η-2) * u[2] + (η -2 + d) * rho * u[3]) -
+            c1 * u[3] * (3 + (n-1)*(1 + (2*rho *u[3])/(1 + u[2]))^2)
         ) / (2 * c1 * rho)
     return nothing
 end
@@ -60,7 +60,14 @@ function geterror(sol)
        (6 * pi^2 * (1 + sol.u1 + 2 * sol.t * sol.u2)^2) + sol.t * sol.u2 - 2 * sol.u1
 end
 
-function dv1(λ, U1, rho, d=3, n=1, η=0)
+function dv1(;λ,v0, U1, rhomin, d=3, n=1, η=0)
     c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
-    return (c1^-1) * (λ - d) * (1 + U1(rho))^2 / n
+    return v0*(c1^-1) * (λ - d) * (1 + U1(rhomin))^2 / n
+end
+
+function etafun(usol,d)
+    rho0=find_zero(x->usol.sol(x)[2], (0.00001, 1.0))
+    upp=usol.sol(rho0)[3]
+    vd=1/(2^(d+1) *pi^(d/2) *gamma(d/2))
+    return 16*vd/d *(rho0*upp^2)/(1+2*rho0*upp)^2
 end

@@ -4,8 +4,8 @@ include("ini.jl")
 include("flow.jl")
 include("solver.jl")
 myT = Double64
-myT2 = BigFloat
-
+myT2 = Float128
+setprecision(BigFloat, 128)
 @time O1sol = O1du1solve(
     O1du1,
     myT(val_A0);
