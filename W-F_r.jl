@@ -12,18 +12,18 @@ tempsol = du1solve(
     method=RadauIIA5(),
     inifun=ini_CS,
 )
-usol_r4 = Dict()
+usol_r2 = Dict()
 usol_r_MWH = Dict()
 # n=1
 usol_r1 = Dict()
 myT = Float64
 Udatasaver3!_r(
-    usol_r4;
+    usol_r2;
     d=2.0,
-    n=1.0,
-    η=0.3,
-    lb_A0=myT(0.5),
-    ub_A0=myT(1000.0),
+    n=1.9,
+    η=0.15,
+    lb_A0=myT(10.),
+    ub_A0=myT(215.97),
     lb_λ=0.5,
     ub_λ=1.8,
     rhomin_pre=1//100,
@@ -36,11 +36,24 @@ Udatasaver3!_r(
 
 plot(x -> usol_r4[(2//1, 1//1)].sol(x)[2], 0.01, 0.2; label="n=1")
 
-etafun_r(usol_r4[(2//1, 1//1)], x->exp(-x)/x, x->-(((1+x)*exp(-x))/x^2), x->((2+2*x+x^2)*exp(-x))/x^3)
+Udatasaver3!_r(
+    usol_r2;
+    d=2.0,
+    n=1.9,
+    η=etafun_r(usol_r2[(2//1, 19//10)], r_exp(2), rp_exp(2), rpp_exp(2)),
+    lb_A0=myT(1.0),
+    ub_A0=myT(10.),
+    lb_λ=0.02,
+    ub_λ=1.,
+    rhomin_pre=1//20,
+    tol_usol=1e-15,
+    tol_A0=1e-20,
+    tol_eigensol=1e-14,
+    tol_λ=1e-14,
+    nr=2,
+)
 
-
-etafun_r(usol_r4[(2//1, 1//1)], r_exp(2), rp_exp(2), rpp_exp(2))
-
+etafun_r(usol_r2[(2//1, 19//10)], r_exp(2), rp_exp(2), rpp_exp(2))
 
 plot(x -> usol_r1[(3//1, 1//1)].sol(x)[2], 0.0001, 0.1; label="n=1")
 plot!(x -> usol_r2[(3//1, 1//1)].sol(x)[2], 0.0001, 0.1; label="n=2")

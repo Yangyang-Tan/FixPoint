@@ -248,7 +248,7 @@ function etafun_r(usol, r, rp, rpp)
     rho0 = find_zero(x -> usol.sol(x)[2], (0.1, 5.0))
     upp = usol.sol(rho0)[3]
     d = usol.d
-    B1B2 = quadgk(x -> B1B2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 4.0; order=10)[1]
-    A1A2 = quadgk(x -> A1A2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 4.0; order=10)[1]
+    B1B2 = quadgk(x -> B1B2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 10.0; order=10)[1]
+    A1A2 = quadgk(x -> A1A2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 10.0; order=10)[1]
     return -B1B2/(1+A1A2)
 end

@@ -28,8 +28,13 @@ function rpp_exp(x, n)
                ((-2 + 2 * n) * (-1 + 2 * n) * x^(-3 + 2 * n)) / 12 -
                ((-2 + 4 * n) * (-1 + 4 * n) * x^(-3 + 4 * n)) / 720
     else
-        ((-1 + n) * x^(-2 + n)) / (-1 + exp(x^n)) -
-        (n * x^(-2 + 2 * n) * exp(x^n)) / (-1 + exp(x^n))^2
+        ((-2 + n) * (-1 + n) * x^(-3 + n)) / (-1 + exp(x^n)) -
+        (2 * (-1 + n) * n * x^(-3 + 2 * n) * exp(x^n)) / (-1 + exp(x^n))^2 +
+        x^(-1 + n) * (
+            -(((-1 + n) * n * x^(-2 + n) * exp(x^n)) / (-1 + exp(x^n))^2) -
+            (n^2 * x^(-2 + 2 * n) * exp(x^n)) / (-1 + exp(x^n))^2 +
+            (2 * n^2 * x^(-2 + 2 * n) * exp(2 * x^n)) / (-1 + exp(x^n))^3
+        )
     end
 end
 
@@ -44,7 +49,6 @@ end
 function rpp_exp(n)
     return x -> rpp_exp(x, n)
 end
-
 
 function lp_ker(y, d, n, η, ωp1)
     r = r_exp
@@ -66,13 +70,14 @@ end
 
 function lpfun(d, n, η)
     T = eltype([d, n, η])
-    lprang = exp.(range(T(log(10^-6)); stop=log(T(log(10^10))), length=1000))
-    lprang_itp = range(log(10^-6); stop=log(log(10^10)), length=1000)
+    lprang = exp.(range(T(log(10^-8)); stop=log(T(log(10^8))), length=1000))
+    lprang_itp = range(log(10^-8); stop=log(log(10^8)), length=1000)
     itp_scale = scale(
         interpolate(lpfun_val.(d, n, η, lprang), BSpline(Linear())), lprang_itp
     )
     return x -> itp_scale(log(x + 1))
 end
+
 
 # function lpfun(d, n, η)
 #     T = eltype([d, n, η])
@@ -81,7 +86,6 @@ end
 #     itp_scale = Spline1D(lprang_itp,lpfun_val.(d, n, η, lprang))
 #     return x -> itp_scale(log(x + 1))
 # end
-
 
 function B1B2fun(d, ρbar, upp, r::Function, rp::Function, rpp::Function, x)
     return (

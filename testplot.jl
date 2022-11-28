@@ -106,3 +106,10 @@ plot(x -> usol_CS[20//10, rationalize(0.8)].sol(x)[2], 0.01, 1.1)
 etafun_CS(usol_CS[20//10, rationalize(0.8)], 20//10)
 usol_CS[20//10, rationalize(0.8)].A0
 usol_CS[20//10, rationalize(0.9)]
+testint = interpolate(myT.(randn(10)), BSpline(Linear()))
+cuitp = adapt(Vector{Double64}, testint);
+
+myT(1.0):myT(1.0):myT(10.0)
+myT.(1.0:1.0:10.0)
+cuitp(myT.(1.0:1.0:10.0))
+unsafe_trunc(Int64, x::Double64)=trunc(Int64, x)
