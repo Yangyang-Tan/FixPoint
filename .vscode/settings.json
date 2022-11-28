@@ -4,6 +4,6 @@
     "julia.additionalArgs": [
     "--optimize=3",
     "--check-bounds=no",
-    "--sysimage /home/tyy/.julia/environments/v1.8/JuliaSysimage.so"
+    // "--sysimage /home/tyy/.julia/environments/v1.8/JuliaSysimage.so"
     ]
 }

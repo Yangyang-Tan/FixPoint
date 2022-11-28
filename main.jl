@@ -1,6 +1,7 @@
 include("load.jl")
 include("struct.jl")
 include("ini.jl")
+include("regulator.jl")
 include("flow.jl")
 include("solver.jl")
 myT = Double64

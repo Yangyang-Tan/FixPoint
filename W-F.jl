@@ -88,7 +88,7 @@ minisave!(; udic_mini=usol_WF_mini, udic_large=usol_WF)
 Udatasaver3!(
     usol_WF;
     d=3.0,
-    n=2.0,
+    n=100.0,
     lb_A0=myT(0.5),
     ub_A0=myT(30),
     lb_λ=0.5,
@@ -100,23 +100,26 @@ Udatasaver3!(
     tol_λ=1e-16,
 )
 
-Threads.@threads for i in 3.4:0.1:3.9
+usol_WF[3.0, 10.0].A0
+plot([usol_WF[3.0, n].A0 for n in 4.0:10.0])
+0.00001
+for i in 3.0:0.1:3.0
     Udatasaver3!(
         usol_WF;
         d=i,
-        n=2.0,
-        lb_A0=myT(0.5),
-        ub_A0=myT(1000),
+        n=20.0,
+        lb_A0=myT(0.0020999856448173524),
+        ub_A0=myT(0.6),
         lb_λ=0.5,
         ub_λ=2.5,
         rhomin_pre=1//100,
-        tol_usol=1e-21,
+        tol_usol=1e-26,
         tol_A0=1e-31,
-        tol_eigensol=1e-16,
-        tol_λ=1e-16,
+        tol_eigensol=1e-14,
+        tol_λ=1e-14,
     )
 end
-
+0.001001459088784356
 #d=3.0
 
 Udatasaver3!(
@@ -430,23 +433,22 @@ Udatasaver3!(
     dtmax=0.005,
 )
 
-
 Threads.@threads for i in 3.4:0.1:3.9
     Udatasaver3!(
-    usol_WF;
-    d=i,
-    n=10.0,
-    lb_A0=myT(0.1),
-    ub_A0=myT(5.0),
-    lb_λ=0.5,
-    ub_λ=1.999,
-    rhomin_pre=1//10000,
-    tol_usol=1e-20,
-    tol_A0=1e-20,
-    tol_eigensol=1e-16,
-    tol_λ=1e-13,
-    dtmax=0.005,
-)
+        usol_WF;
+        d=i,
+        n=10.0,
+        lb_A0=myT(0.1),
+        ub_A0=myT(5.0),
+        lb_λ=0.5,
+        ub_λ=1.999,
+        rhomin_pre=1//10000,
+        tol_usol=1e-20,
+        tol_A0=1e-20,
+        tol_eigensol=1e-16,
+        tol_λ=1e-13,
+        dtmax=0.005,
+    )
 end
 1
 #n=1.5
@@ -466,23 +468,22 @@ Udatasaver3!(
     dtmax=0.005,
 )
 
-
 Threads.@threads for i in 2.4:0.1:3.8
     Udatasaver3!(
-    usol_WF;
-    d=i,
-    n=1.5,
-    lb_A0=myT(usol_WF[i, 1.0].A0),
-    ub_A0=myT(usol_WF[i, 2.0].A0),
-    lb_λ=0.1,
-    ub_λ=1.999,
-    rhomin_pre=1//10000,
-    tol_usol=1e-20,
-    tol_A0=1e-20,
-    tol_eigensol=1e-16,
-    tol_λ=1e-13,
-    dtmax=0.005,
-)
+        usol_WF;
+        d=i,
+        n=1.5,
+        lb_A0=myT(usol_WF[i, 1.0].A0),
+        ub_A0=myT(usol_WF[i, 2.0].A0),
+        lb_λ=0.1,
+        ub_λ=1.999,
+        rhomin_pre=1//10000,
+        tol_usol=1e-20,
+        tol_A0=1e-20,
+        tol_eigensol=1e-16,
+        tol_λ=1e-13,
+        dtmax=0.005,
+    )
 end
 
 usol_lpap[(3.0, 1.0)].λ
@@ -491,7 +492,6 @@ proc = run(`sleep 60`; wait=false)
 Process(`sleep 60`, ProcessRunning)
 kill(proc)
 using Distributed
-
 
 Threads.@threads for i in 1:8
     interrupt()
