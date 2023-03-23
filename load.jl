@@ -1,6 +1,6 @@
-using OrdinaryDiffEq, Plots, Roots, DoubleFloats
+using DifferentialEquations, Plots, Roots, DoubleFloats
 using SpecialFunctions, Dierckx, SplitApplyCombine, Interpolations, DelimitedFiles
-using Optim, ThreadPools
+using Optim, ThreadPools,StaticArrays
 
 # function Nderivative(
 #     x::AbstractArray, y::AbstractArray, z::Number, derivative::Int=2, order::Int=6

@@ -70,12 +70,38 @@ end
 
 function lpfun(d, n, η)
     T = eltype([d, n, η])
-    lprang = exp.(range(T(log(10^-8)); stop=log(T(log(10^8))), length=1000))
-    lprang_itp = range(log(10^-8); stop=log(log(10^8)), length=1000)
+    lprang = exp.(range(T(log(10^-6)); stop=T(log(10^12)), length=2000))
+    lprang_itp = range(log(10^-6); stop=log(10^12), length=2000)
     itp_scale = scale(
         interpolate(lpfun_val.(d, n, η, lprang), BSpline(Linear())), lprang_itp
     )
     return x -> itp_scale(log(x + 1))
+end
+
+
+
+function lpfun(d, n, η)
+    T = eltype([d, n, η])
+    lprang = exp.(range(T(log(10^-4)); stop=T(log(10^4)), length=1000))
+    lprang_itp = range(log(10^-4); stop=log(10^4), length=1000)
+    itp_scale = scale(
+        interpolate(lpfun_val.(d, n, η, lprang), BSpline(Linear())), lprang_itp
+    )
+    lprang2 = exp.(range(T(log(10^-8)); stop=T(log(10^-4)), length=50))
+    lpval2 = -lpfun_val.(d, n, η, lprang2)
+    lprang3 = exp.(range(T(log(10^4)); stop=T(log(10^8)), length=50))
+    lpval3 = -lpfun_val.(d, n, η, lprang3)
+    fun2=curve_fit(PowerFit,lprang2, lpval2)
+    fun3=curve_fit(PowerFit,lprang3, lpval3)
+    return x -> begin
+        if x+1 < 10^-4
+            -fun2(x+1)
+        elseif x+1 > 10^4
+            -fun3(x+1)
+        else
+            itp_scale(log(x + 1))
+        end
+    end
 end
 
 

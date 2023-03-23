@@ -106,10 +106,23 @@ plot(x -> usol_CS[20//10, rationalize(0.8)].sol(x)[2], 0.01, 1.1)
 etafun_CS(usol_CS[20//10, rationalize(0.8)], 20//10)
 usol_CS[20//10, rationalize(0.8)].A0
 usol_CS[20//10, rationalize(0.9)]
-testint = interpolate(myT.(randn(10)), BSpline(Linear()))
-cuitp = adapt(Vector{Double64}, testint);
+testint = lpfun(myT(2.0), 2.0, 0.0)
+testint(Double64(1.0))
 
-myT(1.0):myT(1.0):myT(10.0)
-myT.(1.0:1.0:10.0)
-cuitp(myT.(1.0:1.0:10.0))
-unsafe_trunc(Int64, x::Double64)=trunc(Int64, x)
+plot(x -> usol_MWH_d2n2_eta[rationalize(0.1)].sol(x)[3], 0.01, 0.6)
+plot(x->tempsol(x)[3],0.01,10)
+
+usol_MWH_d2n2_eta[rationalize(0.03)].A0
+1
+usoltemp = findeigenval(
+        Eigenfun;
+        Usol=usol_MWH_eta[(2//1, 2//1)],
+        lambdalb=myT(0.0001),
+        lambdaub=myT(0.1),
+        method=Brent(),
+        tol_eigensol=myT(1e-23),
+        tol_λ=myT(1e-23),
+    )
+
+usol_MWH_d2n2_eta[rationalize(0.1)].A0
+usol_MWH_d2n2_eta[rationalize(0.07)].sol(1.0)

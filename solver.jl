@@ -119,7 +119,7 @@ function getA02(
     )
     println(A0)
     # return @show Nderivative(sol2.t[1:100], sol2.u3[1:100], sol2.t[1])
-    return @show sol2.sol(sol2.t[1], Val{1})[3]
+    return sol2.sol(sol2.t[1], Val{1})[3]
 end
 
 function LossEigensolve(
@@ -215,7 +215,7 @@ function findUmin2(;
     inifun=inidu0,
 ) where {T}
     function fun(x)
-        return getA02(
+        @time return getA02(
             x;
             rhomin=rhomin,
             rhomax=rhomax,
@@ -253,8 +253,12 @@ end
 function findeigenval(
     eigenfun; Usol, lambdalb::T, lambdaub::T, tol_eigensol, tol_λ, method=Brent(), dvfun=dv1
 ) where {T}
-    u1fun = Interpolations.interpolate((Usol.t,), Usol.u2, Gridded(Linear()))
-    u2fun = Interpolations.interpolate((Usol.t,), Usol.u3, Gridded(Linear()))
+    l=length(Usol.t)
+    xgrid = Usol.t[1:div(l,10000):end]
+    ygridu2 = Usol.u2[1:div(l,10000):end]
+    ygridu3 = Usol.u3[1:div(l,10000):end]
+    u1fun = Interpolations.interpolate((xgrid,), ygridu2, Gridded(Linear()))
+    u2fun = Interpolations.interpolate((xgrid,), ygridu3, Gridded(Linear()))
     function fun(para)
         @show para
         loss = LossEigensolve(
@@ -395,7 +399,7 @@ function Udatasaver3!(
         lb=myT(lb_A0),
         ub=myT(ub_A0),
         rhomin=myT(rhomin_pre),
-        rhomax=myT(10),
+        rhomax=myT(20),
         d=myT(d),
         n=myT(n),
         η=myT(η),
@@ -497,7 +501,7 @@ function Udatasaver3!_r(
         lb=myT(lb_A0),
         ub=myT(ub_A0),
         rhomin=myT(rhomin_pre),
-        rhomax=myT(50),
+        rhomax=myT(20),
         d=myT(d),
         n=myT(n),
         η=myT(η),

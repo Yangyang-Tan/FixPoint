@@ -11,6 +11,23 @@ function O1du1(du, u, p, rho)
         ) / (2 * c1 * rho)
     return nothing
 end
+
+
+#Flow eqn for O(1) and u'(ρ) with static array
+function O1du1_SA(u, p, rho)
+    d, n, η, c1 = p
+    # c1 = (2 + d - η) / (pi^(d / 2) * (d * (2 + d) * gamma(d / 2) * 2^(d - 1)))
+    du1 = u[2]
+    du2 = u[3]
+    du3 =
+        (
+            (1 + u[2] + 2 * rho * u[3])^2 * ((η - 2) * u[2] + (η - 2 + d) * rho * u[3]) -
+            c1 * u[3] * (3 + (n - 1) * (1 + (2 * rho * u[3]) / (1 + u[2]))^2)
+        ) / (2 * c1 * rho)
+    return SA[du1, du2, du3]
+end
+
+
 #Flow eqn for C-S Regulator and u'(ρ)
 #u[1] for u'(ρ), u[2] for u''(ρ), du[2] for u'''(ρ)
 function effective_CS(du, u, p, rho)
@@ -247,8 +264,8 @@ end
 function etafun_r(usol, r, rp, rpp)
     rho0 = find_zero(x -> usol.sol(x)[2], (0.1, 5.0))
     upp = usol.sol(rho0)[3]
-    d = usol.d
-    B1B2 = quadgk(x -> B1B2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 10.0; order=10)[1]
-    A1A2 = quadgk(x -> A1A2fun(d, rho0, upp, r, rp, rpp, x), 0.01, 0.1, 1.0, 10.0; order=10)[1]
+    d = 2.0
+    B1B2 = quadgk(x -> B1B2fun(d, rho0, upp, r, rp, rpp, x),0.0,0.001, 0.01, 0.1, 1.0, 10.0,100.0,Inf; order=20,maxevals=10^7)[1]
+    A1A2 = quadgk(x -> A1A2fun(d, rho0, upp, r, rp, rpp, x), 0.0,0.001,0.01, 0.1, 1.0, 10.0,100.0,Inf; order=20,maxevals=10^7)[1]
     return -B1B2/(1+A1A2)
 end

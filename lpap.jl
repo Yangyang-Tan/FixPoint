@@ -1,13 +1,13 @@
 using JLD2
 usol_lpap = Dict()
-
-usol_MWH2 = Dict()
-usol_WF = load_object("data/UdataAll.jld2")
+usol_MWH_eta=Dict()
+usol_MWH_mini = Dict()
+usol_WF = load_object("data/UdataAll_mini.jld2")
 save_object("data/UlpadataAll.jld2", usol_lpap)
 
 usol_lpap = load_object("data/UlpadataAll.jld2")
 usol_lpap2
-
+usol_lpap
 for i in 1:24
     usol_lpap[rationalize.(Float32.(collect(keys(usol_lpap2))[i]))] = usol_lpap2[collect(
         keys(usol_lpap2)
